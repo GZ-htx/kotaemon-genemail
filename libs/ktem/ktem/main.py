@@ -8,6 +8,10 @@ from ktem.pages.settings import SettingsPage
 from ktem.pages.setup import SetupPage
 from theflow.settings import settings as flowsettings
 
+# HTX - Importazione classe TbPage
+from libs.htx.htx.pages import TbPage
+# HTX - Fine importazione classe TbPage
+
 KH_DEMO_MODE = getattr(flowsettings, "KH_DEMO_MODE", False)
 KH_SSO_ENABLED = getattr(flowsettings, "KH_SSO_ENABLED", False)
 KH_ENABLE_FIRST_SETUP = getattr(flowsettings, "KH_ENABLE_FIRST_SETUP", False)
@@ -59,6 +63,16 @@ class App(BaseApp):
                 visible=not self.f_user_management,
             ) as self._tabs["chat-tab"]:
                 self.chat_page = ChatPage(self)
+
+            # HTX - Tab T&B
+            with gr.Tab(
+                    "T&B",
+                    elem_id="tb-tab",
+                    id="tb-tab",
+                    visible=not self.f_user_management
+            ) as self._tabs["tb-tab"]:
+                self.tb_page = TbPage(self)
+            # HTX - Fine tab T&B
 
             if len(self.index_manager.indices) == 1:
                 for index in self.index_manager.indices:

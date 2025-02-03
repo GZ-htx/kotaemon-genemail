@@ -28,6 +28,10 @@ _base_issue_report = (
     else base_models.BaseIssueReport
 )
 
+# HTX - Struttura tabella Customer
+class Customer(_base_customer, table=True):  # type: ignore
+    """Customer table"""
+# HTX - Fine struttura tabella Customer
 
 class Conversation(_base_conv, table=True):  # type: ignore
     """Conversation record"""
