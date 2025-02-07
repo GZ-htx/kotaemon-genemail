@@ -65,7 +65,8 @@ button.selected {
 #settings-tab,
 #help-tab,
 #resources-tab,
-#login-tab {
+#login-tab,
+#tb-tab {
   border: none !important;
 }
 
@@ -86,11 +87,12 @@ button.selected {
 
 #main-chat-bot {
   background: var(--background-fill-primary);
-  flex: auto;
+  /* flex: auto; HTX */
+  flex-grow: 1;
 }
 
 #chat-area {
-  height: var(--main-area-height) !important;
+  /* height: var(--main-area-height) !important;  HTX */
   column-gap: 2px !important;
 }
 
@@ -268,9 +270,12 @@ span.icon {
   overflow-y: auto;
 }
 
+/*
+HTX
 .fill-main-area-height {
   max-height: var(--main-area-height);
 }
+*/
 
 .unset-overflow {
   overflow: unset !important;
@@ -326,12 +331,7 @@ pdfjs-viewer-element {
 
 /* Switch checkbox styles */
 
-/* #is-public-checkbox {
-  position: relative;
-  top: 4px;
-} */
-
-#suggest-chat-checkbox {
+#is-public-checkbox {
   position: relative;
   top: 4px;
 }
@@ -417,42 +417,14 @@ tbody:not(.row_odd) {
   background: var(--table-even-background-fill);
 }
 
-#chat-suggestion {
-  max-height: 350px;
-}
 
-#chat-suggestion table {
-  overflow: hidden;
-}
-
-#chat-suggestion table thead {
+/* HTX */
+.hidden {
   display: none;
 }
 
-#paper-suggestion table {
-  overflow: hidden;
-}
 
-svg.markmap {
-  width: 100%;
-  height: 100%;
-  font-family: Quicksand, sans-serif;
-  font-size: 15px;
+#chat-settings-expand, #tb-settings-expand {
+    bottom: 0;
 }
-
-div.markmap {
-  height: 400px;
-}
-
-#google-login {
-  max-width: 450px;
-}
-
-#user-api-key-wrapper {
-  max-width: 450px;
-}
-
-#login-row {
-  display: grid;
-  place-items: center;
-}
+/* fine HTX */

@@ -25,8 +25,7 @@ if not KH_APP_VERSION:
     except Exception:
         KH_APP_VERSION = "local"
 
-KH_GRADIO_SHARE = config("KH_GRADIO_SHARE", default=False, cast=bool)
-KH_ENABLE_FIRST_SETUP = config("KH_ENABLE_FIRST_SETUP", default=True, cast=bool)
+KH_ENABLE_FIRST_SETUP = True
 KH_DEMO_MODE = config("KH_DEMO_MODE", default=False, cast=bool)
 KH_OLLAMA_URL = config("KH_OLLAMA_URL", default="http://localhost:11434/v1/")
 
@@ -66,8 +65,6 @@ os.environ["HF_HUB_CACHE"] = str(KH_APP_DATA_DIR / "huggingface")
 KH_DOC_DIR = this_dir / "docs"
 
 KH_MODE = "dev"
-KH_SSO_ENABLED = config("KH_SSO_ENABLED", default=False, cast=bool)
-
 KH_FEATURE_CHAT_SUGGESTION = config(
     "KH_FEATURE_CHAT_SUGGESTION", default=False, cast=bool
 )
@@ -81,7 +78,7 @@ KH_FEATURE_USER_MANAGEMENT_ADMIN = str(
 KH_FEATURE_USER_MANAGEMENT_PASSWORD = str(
     config("KH_FEATURE_USER_MANAGEMENT_PASSWORD", default="admin")
 )
-KH_ENABLE_ALEMBIC = False
+KH_ENABLE_ALEMBIC = True
 KH_DATABASE = f"sqlite:///{KH_USER_DATA_DIR / 'sql.db'}"
 KH_FILESTORAGE_PATH = str(KH_USER_DATA_DIR / "files")
 KH_WEB_SEARCH_BACKEND = (
@@ -140,36 +137,31 @@ if config("AZURE_OPENAI_API_KEY", default="") and config(
             "default": False,
         }
 
-OPENAI_DEFAULT = "<YOUR_OPENAI_KEY>"
-OPENAI_API_KEY = config("OPENAI_API_KEY", default=OPENAI_DEFAULT)
-GOOGLE_API_KEY = config("GOOGLE_API_KEY", default="your-key")
-IS_OPENAI_DEFAULT = len(OPENAI_API_KEY) > 0 and OPENAI_API_KEY != OPENAI_DEFAULT
-
-if OPENAI_API_KEY:
+if config("OPENAI_API_KEY", default=""):
     KH_LLMS["openai"] = {
         "spec": {
             "__type__": "kotaemon.llms.ChatOpenAI",
             "temperature": 0,
             "base_url": config("OPENAI_API_BASE", default="")
             or "https://api.openai.com/v1",
-            "api_key": OPENAI_API_KEY,
-            "model": config("OPENAI_CHAT_MODEL", default="gpt-4o-mini"),
+            "api_key": config("OPENAI_API_KEY", default=""),
+            "model": config("OPENAI_CHAT_MODEL", default="gpt-3.5-turbo"),
             "timeout": 20,
         },
-        "default": IS_OPENAI_DEFAULT,
+        "default": True,
     }
     KH_EMBEDDINGS["openai"] = {
         "spec": {
             "__type__": "kotaemon.embeddings.OpenAIEmbeddings",
             "base_url": config("OPENAI_API_BASE", default="https://api.openai.com/v1"),
-            "api_key": OPENAI_API_KEY,
+            "api_key": config("OPENAI_API_KEY", default=""),
             "model": config(
-                "OPENAI_EMBEDDINGS_MODEL", default="text-embedding-3-large"
+                "OPENAI_EMBEDDINGS_MODEL", default="text-embedding-ada-002"
             ),
             "timeout": 10,
             "context_length": 8191,
         },
-        "default": IS_OPENAI_DEFAULT,
+        "default": True,
     }
 
 if config("LOCAL_MODEL", default=""):
@@ -177,21 +169,11 @@ if config("LOCAL_MODEL", default=""):
         "spec": {
             "__type__": "kotaemon.llms.ChatOpenAI",
             "base_url": KH_OLLAMA_URL,
-            "model": config("LOCAL_MODEL", default="qwen2.5:7b"),
+            "model": config("LOCAL_MODEL", default="llama3.1:8b"),
             "api_key": "ollama",
         },
         "default": False,
     }
-    KH_LLMS["ollama-long-context"] = {
-        "spec": {
-            "__type__": "kotaemon.llms.LCOllamaChat",
-            "base_url": KH_OLLAMA_URL.replace("v1/", ""),
-            "model": config("LOCAL_MODEL", default="qwen2.5:7b"),
-            "num_ctx": 8192,
-        },
-        "default": False,
-    }
-
     KH_EMBEDDINGS["ollama"] = {
         "spec": {
             "__type__": "kotaemon.embeddings.OpenAIEmbeddings",
@@ -201,6 +183,7 @@ if config("LOCAL_MODEL", default=""):
         },
         "default": False,
     }
+
     KH_EMBEDDINGS["fast_embed"] = {
         "spec": {
             "__type__": "kotaemon.embeddings.FastEmbedEmbeddings",
@@ -222,9 +205,9 @@ KH_LLMS["google"] = {
     "spec": {
         "__type__": "kotaemon.llms.chats.LCGeminiChat",
         "model_name": "gemini-1.5-flash",
-        "api_key": GOOGLE_API_KEY,
+        "api_key": config("GOOGLE_API_KEY", default="your-key"),
     },
-    "default": not IS_OPENAI_DEFAULT,
+    "default": False,
 }
 KH_LLMS["groq"] = {
     "spec": {
@@ -258,9 +241,8 @@ KH_EMBEDDINGS["google"] = {
     "spec": {
         "__type__": "kotaemon.embeddings.LCGoogleEmbeddings",
         "model": "models/text-embedding-004",
-        "google_api_key": GOOGLE_API_KEY,
-    },
-    "default": not IS_OPENAI_DEFAULT,
+        "google_api_key": config("GOOGLE_API_KEY", default="your-key"),
+    }
 }
 # KH_EMBEDDINGS["huggingface"] = {
 #     "spec": {
@@ -281,6 +263,10 @@ KH_RERANKINGS["cohere"] = {
 }
 
 KH_REASONINGS = [
+    # HTX: Added GenEmailPipeline to the list of reasonings
+    "ktem.reasoning.genemail.GenEmailPipeline",
+    "ktem.reasoning.genscheda.GenSchedaPipeline",
+    # HTX End
     "ktem.reasoning.simple.FullQAPipeline",
     "ktem.reasoning.simple.FullDecomposeQAPipeline",
     "ktem.reasoning.react.ReactAgentPipeline",
@@ -319,12 +305,9 @@ SETTINGS_REASONING = {
 
 USE_NANO_GRAPHRAG = config("USE_NANO_GRAPHRAG", default=False, cast=bool)
 USE_LIGHTRAG = config("USE_LIGHTRAG", default=True, cast=bool)
-USE_MS_GRAPHRAG = config("USE_MS_GRAPHRAG", default=True, cast=bool)
 
-GRAPHRAG_INDEX_TYPES = []
+GRAPHRAG_INDEX_TYPES = ["ktem.index.file.graph.GraphRAGIndex"]
 
-if USE_MS_GRAPHRAG:
-    GRAPHRAG_INDEX_TYPES.append("ktem.index.file.graph.GraphRAGIndex")
 if USE_NANO_GRAPHRAG:
     GRAPHRAG_INDEX_TYPES.append("ktem.index.file.graph.NanoGraphRAGIndex")
 if USE_LIGHTRAG:
@@ -344,7 +327,7 @@ GRAPHRAG_INDICES = [
                 ".png, .jpeg, .jpg, .tiff, .tif, .pdf, .xls, .xlsx, .doc, .docx, "
                 ".pptx, .csv, .html, .mhtml, .txt, .md, .zip"
             ),
-            "private": True,
+            "private": False,
         },
         "index_type": graph_type,
     }
@@ -359,7 +342,7 @@ KH_INDICES = [
                 ".png, .jpeg, .jpg, .tiff, .tif, .pdf, .xls, .xlsx, .doc, .docx, "
                 ".pptx, .csv, .html, .mhtml, .txt, .md, .zip"
             ),
-            "private": True,
+            "private": False,
         },
         "index_type": "ktem.index.file.FileIndex",
     },

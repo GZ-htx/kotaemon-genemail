@@ -13,7 +13,11 @@ from ktem.settings import BaseSettingGroup, SettingGroup, SettingReasoningGroup
 from theflow.settings import settings
 from theflow.utils.modules import import_dotted_string
 
-BASE_PATH = os.environ.get("GR_FILE_ROOT_PATH", "")
+BASE_PATH = os.environ.get("GRADIO_ROOT_PATH", "")
+
+ASSETS_DIR = "assets/img"
+if not os.path.isdir(ASSETS_DIR):
+    ASSETS_DIR = "libs/ktem/ktem/assets/img"
 
 
 class BaseApp:
@@ -39,9 +43,9 @@ class BaseApp:
 
     def __init__(self):
         self.dev_mode = getattr(settings, "KH_MODE", "") == "dev"
-        self.app_name = getattr(settings, "KH_APP_NAME", "Kotaemon")
+        self.app_name = getattr(settings, "KH_APP_NAME", "HTX")
         self.app_version = getattr(settings, "KH_APP_VERSION", "")
-        self.f_user_management = getattr(settings, "KH_FEATURE_USER_MANAGEMENT", False)
+        self.f_user_management = getattr(settings, "KH_FEATURE_USER_MANAGEMENT", True)
         self._theme = KotaemonTheme()
 
         dir_assets = Path(__file__).parent / "assets"
@@ -49,7 +53,7 @@ class BaseApp:
             self._css = fi.read()
         with (dir_assets / "js" / "main.js").open() as fi:
             self._js = fi.read()
-            self._js = self._js.replace("KH_APP_VERSION", self.app_version)
+            self._js = self._js.replace("LOGO_URL", "http://0.0.0.0:7860/file=/Users/tommaso/clean-kotaemon/ktem_app_data/gradio_tmp/6ca2cfcdb04f195c5148189ef7ca8afb6efd27b7/logo_without_bg.png")
         with (dir_assets / "js" / "pdf_viewer.js").open() as fi:
             self._pdf_view_js = fi.read()
             # workaround for Windows path
@@ -57,11 +61,11 @@ class BaseApp:
             self._pdf_view_js = self._pdf_view_js.replace(
                 "PDFJS_PREBUILT_DIR",
                 pdf_js_dist_dir,
-            ).replace("GR_FILE_ROOT_PATH", BASE_PATH)
+            ).replace("GRADIO_ROOT_PATH", BASE_PATH)
         with (dir_assets / "js" / "svg-pan-zoom.min.js").open() as fi:
             self._svg_js = fi.read()
 
-        self._favicon = str(dir_assets / "img" / "favicon.svg")
+        self._favicon = str(dir_assets / "img" / "logo_without_bg.png")
 
         self.default_settings = SettingGroup(
             application=BaseSettingGroup(settings=settings.SETTINGS_APP),
@@ -79,7 +83,7 @@ class BaseApp:
         self.default_settings.index.finalize()
         self.settings_state = gr.State(self.default_settings.flatten())
 
-        self.user_id = gr.State("default" if not self.f_user_management else None)
+        self.user_id = gr.State(1 if not self.f_user_management else None)
 
     def initialize_indices(self):
         """Create the index manager, start indices, and register to app settings"""
@@ -173,25 +177,15 @@ class BaseApp:
         """Called when the app is created"""
 
     def make(self):
-        markmap_js = """
-        <script>
-            window.markmap = {
-                /** @type AutoLoaderOptions */
-                autoLoader: {
-                    toolbar: true, // Enable toolbar
-                },
-            };
-        </script>
-        """
         external_js = (
             "<script type='module' "
             "src='https://cdn.skypack.dev/pdfjs-viewer-element'>"
             "</script>"
+            "<script>"
+            f"{self._svg_js}"
+            "</script>"
             "<script type='module' "
             "src='https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js'>"  # noqa
-            f"{markmap_js}"
-            "<script src='https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16'></script>"  # noqa
-            "<script src='https://cdn.jsdelivr.net/npm/minisearch@7.1.1/dist/umd/index.min.js'></script>"  # noqa
             "</script>"
             "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.css'/>"  # noqa
         )
