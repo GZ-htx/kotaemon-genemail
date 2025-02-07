@@ -29,7 +29,7 @@ class BaseConversation(SQLModel):
             datetime.datetime.now(get_localzone()).strftime("%Y-%m-%d %H:%M:%S")
         )
     )
-    user: str = Field(default="")  # For now we only have one user
+    user: int = Field(default=0)  # For now we only have one user
 
     is_public: bool = Field(default=False)
 
@@ -55,9 +55,7 @@ class BaseUser(SQLModel):
 
     __table_args__ = {"extend_existing": True}
 
-    id: str = Field(
-        default_factory=lambda: uuid.uuid4().hex, primary_key=True, index=True
-    )
+    id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True)
     username_lower: str = Field(unique=True)
     password: str
@@ -78,7 +76,7 @@ class BaseSettings(SQLModel):
     id: str = Field(
         default_factory=lambda: uuid.uuid4().hex, primary_key=True, index=True
     )
-    user: str = Field(default="")
+    user: int = Field(default=0)
     setting: dict = Field(default={}, sa_column=Column(JSON))
 
 
@@ -99,7 +97,7 @@ class BaseIssueReport(SQLModel):
     issues: dict = Field(default={}, sa_column=Column(JSON))
     chat: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     settings: Optional[dict] = Field(default=None, sa_column=Column(JSON))
-    user: Optional[str] = Field(default=None)
+    user: Optional[int] = Field(default=None)
 
 
 # HTX - Struttura tabella Customer
@@ -118,3 +116,43 @@ class BaseCustomer(SQLModel):
     name: str
     description: str
 # HTX - Fine struttura tabella Customer
+
+
+# HTX - Struttura tabella TenderType
+class BaseTenderType(SQLModel):
+    """Store the tender type information
+
+    Attributes:
+        id: id to identify the tender type
+        name: the name of the tender type
+        description: the description of what the tender type does
+    """
+
+    __table_args__ = {"extend_existing": True}
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    description: str
+    attachment_description: str
+    customer_description: str
+    task_description: str
+    template_description: str
+# HTX - Fine struttura tabella TenderType
+
+
+# HTX: Base Scheda Prompt
+class BaseSchedaPrompt(SQLModel):
+    """Store the prompt information
+
+    Attributes:
+        id: id to identify the prompt
+        name: the name of the prompt
+        description: the description of what the prompt does
+    """
+
+    __table_args__ = {"extend_existing": True}
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    task: str
+# HTX: Fine Base Scheda Prompt

@@ -28,10 +28,26 @@ _base_issue_report = (
     else base_models.BaseIssueReport
 )
 
-# HTX - Struttura tabella Customer
-class Customer(_base_customer, table=True):  # type: ignore
-    """Customer table"""
-# HTX - Fine struttura tabella Customer
+# HTX - Struttura nuove tabelle
+_base_customer = (
+    import_dotted_string(settings.KH_TABLE_CUSTOMER, safe=False)
+    if hasattr(settings, "KH_TABLE_CUSTOMER")
+    else base_models.BaseCustomer
+)
+
+_base_tender_type = (
+    import_dotted_string(settings.KH_TABLE_TENDER_TYPE, safe=False)
+    if hasattr(settings, "KH_TABLE_TENDER_TYPE")
+    else base_models.BaseTenderType
+)
+
+_base_scheda_prompt = (
+    import_dotted_string(settings.KH_TABLE_SCHEDA_PROMPT, safe=False)
+    if hasattr(settings, "KH_TABLE_SCHEDA_PROMPT")
+    else base_models.BaseSchedaPrompt
+)
+# HTX - Fine struttura nuove tabelle
+
 
 class Conversation(_base_conv, table=True):  # type: ignore
     """Conversation record"""
@@ -47,6 +63,24 @@ class Settings(_base_settings, table=True):  # type: ignore
 
 class IssueReport(_base_issue_report, table=True):  # type: ignore
     """Record of issues"""
+
+
+# HTX - Struttura tabella Customer
+class Customer(_base_customer, table=True):  # type: ignore
+    """Customer table"""
+# HTX - Fine struttura tabella Customer
+
+
+# HTX - Struttura tabella TenderType
+class TenderType(_base_tender_type, table=True):  # type: ignore
+    """TenderType table"""
+# HTX - Fine struttura tabella TenderType
+
+
+# HTX - Struttura tabella SchedaPrompt
+class SchedaPrompt(_base_scheda_prompt, table=True):  # type: ignore
+    """SchedaPrompt table"""
+# HTX - Fine struttura tabella SchedaPrompt
 
 
 if not getattr(settings, "KH_ENABLE_ALEMBIC", False):
