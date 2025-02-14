@@ -349,4 +349,5 @@ KH_INDICES = [
     *GRAPHRAG_INDICES,
 ]
 
+# HTX: our custom Long Context pipeline
 FILE_INDEX_RETRIEVER_PIPELINES = ["ktem.index.file.pipelines.LongContextRetrievalPipeline"]
