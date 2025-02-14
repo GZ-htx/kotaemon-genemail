@@ -167,10 +167,18 @@ class VectorRetrieval(BaseRetrieval):
 
         if self.retrieval_mode == "vector":
             emb = self.embedding(text)[0].embedding
+            # HTX: vari print di controllo
+            print("QUI PASSO")
+            print(emb[:10])
             _, scores, ids = self.vector_store.query(
                 embedding=emb, top_k=top_k_first_round, **kwargs
             )
+            print(scores)
+            print(ids)
             docs = self.doc_store.get(ids)
+            for i, doc in enumerate(docs):
+                print(f"docs numero {i}")
+                print(f"Contenuto: {doc.content[:100]}")
             result = [
                 RetrievedDocument(**doc.to_dict(), score=score)
                 for doc, score in zip(docs, scores)
@@ -247,12 +255,17 @@ class VectorRetrieval(BaseRetrieval):
         result = self._filter_docs(result, top_k=top_k)
         print(f"Got raw {len(result)} retrieved documents")
 
+        return result
+
+        # HTX: removed this old code that was responsible for the images bug
+        """
         # add page thumbnails to the result if exists
-        thumbnail_doc_ids: set[str] = set()
+        thumbnail_doc_ids: list[str] = []
         # we should copy the text from retrieved text chunk
         # to the thumbnail to get relevant LLM score correctly
         text_thumbnail_docs: dict[str, RetrievedDocument] = {}
-
+        
+        
         non_thumbnail_docs = []
         raw_thumbnail_docs = []
         for doc in result:
@@ -266,10 +279,13 @@ class VectorRetrieval(BaseRetrieval):
                 and len(thumbnail_doc_ids) < thumbnail_count
             ):
                 thumbnail_id = doc.metadata["thumbnail_doc_id"]
-                thumbnail_doc_ids.add(thumbnail_id)
+                thumbnail_doc_ids.append(thumbnail_id)
                 text_thumbnail_docs[thumbnail_id] = doc
             else:
                 non_thumbnail_docs.append(doc)
+
+        print("thumbnail doc ids", thumbnail_doc_ids)
+        print("non-thumbnail doc ids", [doc.doc_id for doc in non_thumbnail_docs])
 
         linked_thumbnail_docs = self.doc_store.get(list(thumbnail_doc_ids))
         print(
@@ -294,13 +310,23 @@ class VectorRetrieval(BaseRetrieval):
 
             additional_docs.append(RetrievedDocument(**doc_dict, score=text_doc.score))
 
+        print("additional docs", len(additional_docs))
         result = additional_docs + non_thumbnail_docs
 
         if not result:
             # return output from raw retrieved thumbnails
             result = self._filter_docs(raw_thumbnail_docs, top_k=thumbnail_count)
+        
+        
+        print("results", len(result))
 
+        for res in result:
+            print(f"Score: {res.score}")
+            print(f"Id: {res.doc_id}")
+            print(f"Text: {res.content[:100]}")
         return result
+
+        """
 
 
 class TextVectorQA(BaseComponent):

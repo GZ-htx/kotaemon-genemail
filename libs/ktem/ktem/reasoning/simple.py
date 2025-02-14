@@ -158,6 +158,9 @@ class FullQAPipeline(BaseReasoning):
             )
             for doc in plot_docs
         ]
+        # HTX: print di controllo
+        print(f"Lunghezza docs: {len(docs)}")
+        print(f"Lunghezza info: {len(info)}")
 
         return docs, info
 

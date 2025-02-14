@@ -110,14 +110,19 @@ class LanceDBDocumentStore(BaseDocumentStore):
             )
         except (ValueError, FileNotFoundError):
             docs = []
-        return [
-            Document(
+
+        # HTX: fixed error in the reading from docstore
+        doc_dict = {
+            doc["id"]: Document(
                 id_=doc["id"],
                 text=doc["text"] if doc["text"] else "<empty>",
                 metadata=json.loads(doc["attributes"]),
             )
             for doc in docs
-        ]
+        }
+        # return the documents using the order of ids (which was ordered by score)
+        return [doc_dict[_id] for _id in ids if _id in doc_dict]
+        # HTX: end
 
     def delete(self, ids: Union[List[str], str], refresh_indices: bool = True):
         """Delete document by id"""

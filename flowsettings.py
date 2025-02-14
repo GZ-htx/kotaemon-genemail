@@ -263,14 +263,14 @@ KH_RERANKINGS["cohere"] = {
 }
 
 KH_REASONINGS = [
-    # HTX: Added GenEmailPipeline to the list of reasonings
-    "ktem.reasoning.genemail.GenEmailPipeline",
-    "ktem.reasoning.genscheda.GenSchedaPipeline",
-    # HTX End
     "ktem.reasoning.simple.FullQAPipeline",
     "ktem.reasoning.simple.FullDecomposeQAPipeline",
     "ktem.reasoning.react.ReactAgentPipeline",
     "ktem.reasoning.rewoo.RewooAgentPipeline",
+    # HTX: Added GenEmailPipeline to the list of reasonings
+    "ktem.reasoning.genemail.GenEmailPipeline",
+    "ktem.reasoning.genscheda.GenSchedaPipeline",
+    # HTX End
 ]
 KH_REASONINGS_USE_MULTIMODAL = config("USE_MULTIMODAL", default=False, cast=bool)
 KH_VLM_ENDPOINT = "{0}/openai/deployments/{1}/chat/completions?api-version={2}".format(
@@ -348,3 +348,5 @@ KH_INDICES = [
     },
     *GRAPHRAG_INDICES,
 ]
+
+FILE_INDEX_RETRIEVER_PIPELINES = ["ktem.index.file.pipelines.LongContextRetrievalPipeline"]

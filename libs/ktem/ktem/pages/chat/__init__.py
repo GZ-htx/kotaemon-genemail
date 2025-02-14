@@ -211,6 +211,22 @@ class ChatPage(BasePage):
                         elem_id="chat-settings-expand",
                         open=False,
                     ):
+                        # HTX: added dropdown to choose between RAG and Long Context
+                        with gr.Row():
+                            self.answer_method = gr.Dropdown(
+                                choices=[
+                                            (DEFAULT_SETTING, DEFAULT_SETTING),
+                                        ]
+                                        + self._app.default_settings.reasoning.options["genscheda"]
+                                        .settings["answer_method"]
+                                        .choices,
+                                value=DEFAULT_SETTING,
+                                container=False,
+                                show_label=False,
+                                interactive=True,
+                            )
+                        # HTX: end
+
                         with gr.Row(elem_id="quick-setting-labels"):
                             gr.HTML("Reasoning method")
                             gr.HTML("Model")
@@ -298,8 +314,6 @@ class ChatPage(BasePage):
                             tender_types = get_tender_types_from_db()
                             self.tender_type_map = {t.name: t.id for t in tender_types}
                             tender_type_names = list(self.tender_type_map.keys())
-                            print("AAA")
-                            print(tender_type_names)
                             self.tender_type_choice = gr.Dropdown(
                                 choices=tender_type_names,
                                 value=tender_type_names[0] if tender_type_names else None,
@@ -390,6 +404,9 @@ class ChatPage(BasePage):
                     self.model_type,
                     self.use_mindmap,
                     self.citation,
+                    # HTX: added parameter
+                    self.answer_method,
+                    # HTX: end
                     self.language,
                     self.state_chat,
                     self._command_state,
@@ -1034,6 +1051,9 @@ class ChatPage(BasePage):
         session_llm: str,
         session_use_mindmap: bool | str,
         session_use_citation: str,
+        # HTX: added parameter
+        session_use_answer_method: str,
+        # HTX: end
         session_language: str,
         state: dict,
         command_state: str | None,
@@ -1059,6 +1079,10 @@ class ChatPage(BasePage):
             session_use_mindmap,
             "use citation",
             session_use_citation,
+            # HTX: added answer method
+            "use answer method",
+            session_use_answer_method,
+            # HTX: end
             "language",
             session_language,
         )
@@ -1088,6 +1112,13 @@ class ChatPage(BasePage):
             settings[
                 "reasoning.options.simple.highlight_citation"
             ] = session_use_citation
+
+        # HTX: added answer method
+        if session_use_answer_method not in (DEFAULT_SETTING, None):
+            settings[
+                "reasoning.options.genscheda.answer_method"
+            ] = session_use_answer_method
+        # HTX: end
 
         if session_language not in (DEFAULT_SETTING, None):
             settings["reasoning.lang"] = session_language
@@ -1137,6 +1168,9 @@ class ChatPage(BasePage):
         llm_type,
         use_mind_map,
         use_citation,
+        # HTX: added parameter
+        use_answer_method,
+        # HTX: end
         language,
         chat_state,
         command_state,
@@ -1169,6 +1203,9 @@ class ChatPage(BasePage):
             llm_type,
             use_mind_map,
             use_citation,
+            # HTX: added parameter
+            use_answer_method,
+            # HTX: end
             language,
             chat_state,
             command_state,

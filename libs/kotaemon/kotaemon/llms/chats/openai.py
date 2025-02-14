@@ -226,6 +226,8 @@ class BaseChatOpenAI(ChatLLM):
     def stream(
         self, messages: str | BaseMessage | list[BaseMessage], *args, **kwargs
     ) -> Iterator[LLMInterface]:
+        # HTX: commenti di debugging
+        print("QUI STO CHIAMANDO OPENAI")
         client = self.prepare_client(async_version=False)
         input_messages = self.prepare_message(messages)
         resp = self.openai_response(
@@ -323,6 +325,10 @@ class ChatOpenAI(BaseChatOpenAI):
     def openai_response(self, client, **kwargs):
         """Get the openai response"""
         params = self.prepare_params(**kwargs)
+        # HTX: commenti di debugging
+        print("RISPOSTA OPENAI")
+        print("PARAMETRI OPENAI")
+        # print(params)
         return client.chat.completions.create(**params)
 
     async def aopenai_response(self, client, **kwargs):

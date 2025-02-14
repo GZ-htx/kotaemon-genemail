@@ -225,6 +225,7 @@ class FileIndex(BaseIndex):
             return
 
         if hasattr(flowsettings, "FILE_INDEX_RETRIEVER_PIPELINES"):
+            print("SONO ENTRATO NEL POSTO GIUSTO")
             self._retriever_pipeline_cls = [
                 import_dotted_string(each, safe=False)
                 for each in getattr(flowsettings, "FILE_INDEX_RETRIEVER_PIPELINES")
@@ -447,6 +448,8 @@ class FileIndex(BaseIndex):
                 stripped_settings[key[len(prefix) :]] = value
 
         obj = self._indexing_pipeline_cls.get_pipeline(stripped_settings, self.config)
+        print("OGGETTO")
+        print(obj)
         obj.Source = self._resources["Source"]
         obj.Index = self._resources["Index"]
         obj.VS = self._vs

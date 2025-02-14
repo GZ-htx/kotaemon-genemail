@@ -378,6 +378,15 @@ class GenSchedaPipeline(BaseReasoning):
                     ("no citation", "off"),
                 ],
             },
+            "answer_method": {
+                "name": "Answer Method",
+                "value": "rag",
+                "component": "radio",
+                "choices": [
+                    ("RAG", "rag"),
+                    ("Long Context", "long_context")
+                ],
+            },
             "create_mindmap": {
                 "name": "Create Mindmap",
                 "value": False,
