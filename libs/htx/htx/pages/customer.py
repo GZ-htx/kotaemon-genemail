@@ -3,6 +3,8 @@ import pandas as pd
 from ktem.app import BasePage
 from sqlmodel import Session, select
 from ktem.db.models import Customer, engine
+
+
 class CustomerManagement(BasePage):
     def __init__(self, app):
         self._app = app
