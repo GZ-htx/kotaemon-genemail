@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from theflow.settings import settings
 from theflow.utils.modules import import_dotted_string
 # HTX: import customer
-from libs.htx.htx.db.models import Customer
+from libs.htx.htx.db.models import Customer, TenderType, SchedaPrompt
 # HTX: end
 
 _base_conv = (
