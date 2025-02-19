@@ -1,6 +1,7 @@
 import os
 
 from theflow.settings import settings as flowsettings
+import libs.htx.htx.db.models as htx_models
 
 KH_APP_DATA_DIR = getattr(flowsettings, "KH_APP_DATA_DIR", ".")
 KH_GRADIO_SHARE = getattr(flowsettings, "KH_GRADIO_SHARE", False)
