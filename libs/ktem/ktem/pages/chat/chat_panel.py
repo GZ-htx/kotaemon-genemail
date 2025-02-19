@@ -1,21 +1,5 @@
 import gradio as gr
 from ktem.app import BasePage
-from theflow.settings import settings as flowsettings
-
-KH_DEMO_MODE = getattr(flowsettings, "KH_DEMO_MODE", False)
-
-if not KH_DEMO_MODE:
-    PLACEHOLDER_TEXT = (
-        "This is the beginning of a new conversation.\n"
-        "Start by uploading a file or a web URL. "
-        "Visit Files tab for more options (e.g: GraphRAG)."
-    )
-else:
-    PLACEHOLDER_TEXT = (
-        "Welcome to Kotaemon Demo. "
-        "Start by browsing preloaded conversations to get onboard.\n"
-        "Check out Hint section for more tips."
-    )
 
 
 class ChatPanel(BasePage):
@@ -26,7 +10,10 @@ class ChatPanel(BasePage):
     def on_building_ui(self):
         self.chatbot = gr.Chatbot(
             label=self._app.app_name,
-            placeholder=PLACEHOLDER_TEXT,
+            placeholder=(
+                "This is the beginning of a new conversation.\nIf you are new, "
+                "visit the Help tab for quick instructions."
+            ),
             show_label=False,
             elem_id="main-chat-bot",
             show_copy_button=True,
@@ -44,8 +31,12 @@ class ChatPanel(BasePage):
                 container=False,
                 show_label=False,
                 elem_id="chat-input",
+                # HTX: avoid textarea to be too big
+                max_lines=6,
+                # HTX: end
             )
 
     def submit_msg(self, chat_input, chat_history):
         """Submit a message to the chatbot"""
         return "", chat_history + [(chat_input, None)]
+
