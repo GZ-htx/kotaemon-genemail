@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from ktem.db.models import Customer, engine
+from libs.htx.htx.db.models import Customer, engine
 
 def get_customers_from_db():
     with Session(engine) as session:

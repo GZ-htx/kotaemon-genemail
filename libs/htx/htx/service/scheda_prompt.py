@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from ktem.db.models import SchedaPrompt, engine
+from libs.htx.htx.db.models import SchedaPrompt, engine
 
 def get_prompts_from_db():
     with Session(engine) as session:

@@ -285,6 +285,10 @@ KH_REASONINGS = [
     "ktem.reasoning.simple.FullDecomposeQAPipeline",
     "ktem.reasoning.react.ReactAgentPipeline",
     "ktem.reasoning.rewoo.RewooAgentPipeline",
+    # HTX: add new reasoning pipelines
+    "ktem.reasoning.genemail.GenEmailPipeline",
+    "ktem.reasoning.genscheda.GenSchedaPipeline",
+    # HTX: end
 ]
 KH_REASONINGS_USE_MULTIMODAL = config("USE_MULTIMODAL", default=False, cast=bool)
 KH_VLM_ENDPOINT = "{0}/openai/deployments/{1}/chat/completions?api-version={2}".format(
