@@ -102,6 +102,11 @@ KH_VECTORSTORE = {
     # "__type__": "kotaemon.storages.QdrantVectorStore",
     "path": str(KH_USER_DATA_DIR / "vectorstore"),
 }
+# HTX: add folder for txt files
+KH_TXT_FILES = KH_USER_DATA_DIR / "txt_files"
+KH_TXT_FILES.mkdir(parents=True, exist_ok=True)
+# HTX: end
+
 KH_LLMS = {}
 KH_EMBEDDINGS = {}
 KH_RERANKINGS = {}
@@ -286,8 +291,8 @@ KH_REASONINGS = [
     "ktem.reasoning.react.ReactAgentPipeline",
     "ktem.reasoning.rewoo.RewooAgentPipeline",
     # HTX: add new reasoning pipelines
-    "ktem.reasoning.genemail.GenEmailPipeline",
-    "ktem.reasoning.genscheda.GenSchedaPipeline",
+    "libs.htx.htx.reasoning.genemail.GenEmailPipeline",
+    "libs.htx.htx.reasoning.genscheda.GenSchedaPipeline",
     # HTX: end
 ]
 KH_REASONINGS_USE_MULTIMODAL = config("USE_MULTIMODAL", default=False, cast=bool)
