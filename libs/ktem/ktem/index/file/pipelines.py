@@ -15,6 +15,10 @@ from typing import Generator, Optional, Sequence
 
 import tiktoken
 from decouple import config
+
+# HTX: import the function that stores the txt file
+from htx.components.long_context import store_txt_file
+# HTX: end
 from ktem.db.models import engine
 from ktem.embeddings.manager import embedding_models_manager
 from ktem.llms.manager import llms
@@ -534,6 +538,9 @@ class IndexPipeline(BaseComponent):
             session.commit()
             file_id = source.id
 
+        # HTX: call the function that stores the txt
+        store_txt_file(file_path, file_hash)
+        # HTX: end
         return file_id
 
     def finish(self, file_id: str, file_path: str | Path) -> str:

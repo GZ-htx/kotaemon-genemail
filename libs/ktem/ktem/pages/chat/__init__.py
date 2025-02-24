@@ -211,6 +211,13 @@ class ChatPage(BasePage):
                         elem_id="chat-settings-expand",
                         open=False,
                     ):
+                        with gr.Row():
+                            self.use_long_context = gr.State(value=DEFAULT_SETTING)
+                            self.use_long_context_check = gr.Checkbox(
+                                label="Use the entire document as context",
+                                container=False,
+                                elem_id="use-long-context",
+                            )
 
                         with gr.Row(elem_id="quick-setting-labels"):
                             gr.HTML("Reasoning method")
@@ -286,20 +293,30 @@ class ChatPage(BasePage):
                         open=False,
                         visible=False,
                     ) as self.tb_settings:
+                        with gr.Row(elem_id="genemail-labels") as self.genemail_labels:
+                            gr.HTML("Customer")
+                            gr.HTML("Tender Type")
+                        with gr.Row(elem_id="genscheda-labels") as self.genscheda_labels:
+                            gr.HTML("Tender Type")
+
                         with gr.Row():
                             customers = get_customers_from_db()
+                            print("Number of customers", len(customers))
                             self.customer_map = {c.name: c.id for c in customers}
                             customer_names = list(self.customer_map.keys())
                             self.customer_choice = gr.Dropdown(
+                                label="Customer",
                                 choices=customer_names,
                                 value=customer_names[0] if customer_names else None,
                                 container=False,
                                 show_label=False,
                             )
                             tender_types = get_tender_types_from_db()
+                            print("Number of tender types", len(tender_types))
                             self.tender_type_map = {t.name: t.id for t in tender_types}
                             tender_type_names = list(self.tender_type_map.keys())
                             self.tender_type_choice = gr.Dropdown(
+                                label="Tender Type",
                                 choices=tender_type_names,
                                 value=tender_type_names[0] if tender_type_names else None,
                                 container=False,
@@ -308,10 +325,12 @@ class ChatPage(BasePage):
                             )
 
                             prompts = get_prompts_from_db()
+                            print("Number of prompts", len(prompts))
                             print("Prompts", len(prompts))
                             self.prompt_map = {p.name: p.id for p in prompts}
                             prompt_names = list(self.prompt_map.keys())
                             self.prompt_choice = gr.Dropdown(
+                                label="Tender Type",
                                 choices=prompt_names,
                                 value=prompt_names[0] if prompt_names else None,
                                 container=False,
@@ -389,6 +408,9 @@ class ChatPage(BasePage):
                     self._reasoning_type,
                     self.model_type,
                     self.use_mindmap,
+                    # HTX: long context bool parameter
+                    self.use_long_context,
+                    # HTX: end
                     self.citation,
                     self.language,
                     self.state_chat,
@@ -687,7 +709,9 @@ class ChatPage(BasePage):
                 self.generated_prompt_content,
                 self.customer_choice,
                 self.tender_type_choice,
-                self.prompt_choice
+                self.prompt_choice,
+                self.genemail_labels,
+                self.genscheda_labels
             ],
         )
         # HTX - end - events on TB tab
@@ -703,6 +727,12 @@ class ChatPage(BasePage):
             inputs=[self.use_chat_suggestion],
             outputs=[self._use_suggestion, self.followup_questions_ui],
             show_progress="hidden",
+        )
+        # HTX: toggle of long context checkbox
+        self.use_long_context_check.change(
+            lambda x: x,
+            inputs=[self.use_long_context_check],
+            outputs=[self.use_long_context],
         )
         self.chat_control.conversation_id.change(
             lambda: gr.update(visible=False),
@@ -979,7 +1009,9 @@ class ChatPage(BasePage):
                 self.update_generated_prompt_email(first_customer, first_tender_type),
                 gr.update(value=first_customer, visible=True),
                 gr.update(value=first_tender_type, visible=True),
-                gr.update(visible=False)
+                gr.update(visible=False),
+                gr.update(visible=True),
+                gr.update(visible=False),
             )
 
         elif reasoning_type == "genscheda":
@@ -994,11 +1026,22 @@ class ChatPage(BasePage):
                 self.update_generated_prompt_scheda(first_prompt),
                 gr.update(visible=False),
                 gr.update(visible=False),
-                gr.update(value=first_prompt, visible=True)
+                gr.update(value=first_prompt, visible=True),
+                gr.update(visible=False),
+                gr.update(visible=True),
             )
 
-        return reasoning_type, gr.update(visible=False), gr.update(visible=False), "", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
-        # return reasoning_type
+        return (
+            reasoning_type,
+            gr.update(visible=False),
+            gr.update(visible=False),
+            "",
+            gr.update(visible=False),
+            gr.update(visible=False),
+            gr.update(visible=False),
+            gr.update(visible=False),
+            gr.update(visible=False)
+        )
     # HTX - end - function that is called when reasoning type is changed
 
     def is_liked(self, convo_id, liked: gr.LikeData):
@@ -1033,6 +1076,9 @@ class ChatPage(BasePage):
         session_reasoning_type: str,
         session_llm: str,
         session_use_mindmap: bool | str,
+        # HTX: added long context bool parameter
+        session_use_long_context: bool | str,
+        # HTX: end
         session_use_citation: str,
         session_language: str,
         state: dict,
@@ -1059,6 +1105,8 @@ class ChatPage(BasePage):
             session_use_mindmap,
             "use citation",
             session_use_citation,
+            "use_long_context",
+            session_use_long_context,
             "language",
             session_language,
         )
@@ -1083,6 +1131,11 @@ class ChatPage(BasePage):
 
         if session_use_mindmap not in (DEFAULT_SETTING, None):
             settings["reasoning.options.simple.create_mindmap"] = session_use_mindmap
+
+        # HTX: added long context bool parameter
+        if session_use_long_context not in (DEFAULT_SETTING, None):
+            settings["reasoning.options.simple.use_long_context"] = session_use_long_context
+        # HTX: end
 
         if session_use_citation not in (DEFAULT_SETTING, None):
             settings[
@@ -1127,15 +1180,15 @@ class ChatPage(BasePage):
 
     def chat_fn(
         self,
-        # HTX: added customer choice variable to the main function
-        # customer_choice,
-        # HTX: End - added customer choice variable to the main function
         conversation_id,
         chat_history,
         settings,
         reasoning_type,
         llm_type,
         use_mind_map,
+        # HTX: added long context bool parameter
+        use_long_context,
+        # HTX: end
         use_citation,
         language,
         chat_state,
@@ -1168,6 +1221,9 @@ class ChatPage(BasePage):
             reasoning_type,
             llm_type,
             use_mind_map,
+            # HTX: added long context bool parameter
+            use_long_context,
+            # HTX: end
             use_citation,
             language,
             chat_state,
