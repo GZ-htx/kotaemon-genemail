@@ -380,6 +380,9 @@ class FullQAPipeline(BaseReasoning):
             settings["reasoning.lang"], "English"
         )
 
+        # HTX: add long context parameter
+        pipeline.use_long_context = settings[f"{prefix}.use_long_context"]
+        # HTX: end
         pipeline.add_query_context.llm = llm
         pipeline.add_query_context.n_last_interactions = settings[
             f"{prefix}.n_last_interactions"
@@ -436,6 +439,13 @@ class FullQAPipeline(BaseReasoning):
                 "value": False,
                 "component": "checkbox",
             },
+            # HTX: add parameter for long context
+            "use_long_context": {
+                "name": "Use Long Context",
+                "value": False,
+                "component": "checkbox",
+            },
+            # HTX: end
             "create_citation_viz": {
                 "name": "Create Embeddings Visualization",
                 "value": False,

@@ -309,6 +309,7 @@ class ChatPage(BasePage):
                                 choices=customer_names,
                                 value=customer_names[0] if customer_names else None,
                                 container=False,
+                                allow_custom_value=True,
                                 show_label=False,
                             )
                             tender_types = get_tender_types_from_db()
@@ -321,14 +322,15 @@ class ChatPage(BasePage):
                                 value=tender_type_names[0] if tender_type_names else None,
                                 container=False,
                                 show_label=False,
+                                allow_custom_value=True,
                                 interactive=True
                             )
 
                             prompts = get_prompts_from_db()
                             print("Number of prompts", len(prompts))
-                            print("Prompts", len(prompts))
                             self.prompt_map = {p.name: p.id for p in prompts}
                             prompt_names = list(self.prompt_map.keys())
+                            print(prompt_names)
                             self.prompt_choice = gr.Dropdown(
                                 label="Tender Type",
                                 choices=prompt_names,
@@ -336,6 +338,7 @@ class ChatPage(BasePage):
                                 container=False,
                                 show_label=False,
                                 interactive=True,
+                                allow_custom_value=True,
                                 visible=False  # nascondo inizialmente il dropdown
                             )
                 # HTX: End - T&B panel

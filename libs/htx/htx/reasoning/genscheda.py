@@ -65,6 +65,13 @@ class GenSchedaPipeline(FullQAPipeline):
                 "value": False,
                 "component": "checkbox",
             },
+            # HTX: add parameter for long context
+            "use_long_context": {
+                "name": "Use Long Context",
+                "value": False,
+                "component": "checkbox",
+            },
+            # HTX: end
             "create_citation_viz": {
                 "name": "Create Embeddings Visualization",
                 "value": False,
