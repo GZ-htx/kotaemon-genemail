@@ -55,7 +55,7 @@ class NanoGraphRAGIndex(GraphRAGIndex):
         return pipeline
 
     def get_retriever_pipelines(
-        self, settings: dict, user_id: int, selected: Any = None
+        self, settings: dict, user_id: int, selected: Any = None, lc: bool = False
     ) -> list["BaseFileIndexRetriever"]:
         file_ids = self._selector_ui.get_selected_ids(selected)
         # retrieval settings

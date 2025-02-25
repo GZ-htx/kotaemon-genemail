@@ -38,7 +38,7 @@ CONTEXT_RELEVANT_WARNING_SCORE = config(
 )
 
 DEFAULT_QA_TEXT_PROMPT = (
-    "Domanda: {question}\n"
+    "{question}\n"
     "Rispondi in {lang}.\n\n"
     "Contesto: {context}\n"
     "Risposta:"

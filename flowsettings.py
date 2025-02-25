@@ -293,6 +293,9 @@ KH_REASONINGS = [
     # HTX: add new reasoning pipelines
     "libs.htx.htx.reasoning.genemail.GenEmailPipeline",
     "libs.htx.htx.reasoning.genscheda.GenSchedaPipeline",
+    "libs.htx.htx.reasoning.simplelc.FullQAPipelineLC",
+    "libs.htx.htx.reasoning.genemaillc.GenEmailPipelineLC",
+    "libs.htx.htx.reasoning.genschedalc.GenSchedaPipelineLC",
     # HTX: end
 ]
 KH_REASONINGS_USE_MULTIMODAL = config("USE_MULTIMODAL", default=False, cast=bool)

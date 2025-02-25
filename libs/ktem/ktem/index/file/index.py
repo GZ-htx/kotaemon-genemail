@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Optional, Type
 
+from htx.pipelines.long_context_retrieval import LongContextRetrievalPipeline
 from ktem.components import filestorage_path, get_docstore, get_vectorstore
 from ktem.db.engine import engine
 from ktem.index.base import BaseIndex
@@ -460,7 +461,7 @@ class FileIndex(BaseIndex):
         return obj
 
     def get_retriever_pipelines(
-        self, settings: dict, user_id: int, selected: Any = None
+        self, settings: dict, user_id: int, selected: Any = None, lc: bool = False
     ) -> list["BaseFileIndexRetriever"]:
         # retrieval settings
         prefix = f"index.options.{self.id}."
@@ -472,11 +473,10 @@ class FileIndex(BaseIndex):
         # transform selected id
         selected_ids: Optional[list[str]] = self._selector_ui.get_selected_ids(selected)
 
+        # HTX long context
         retrievers = []
-        for cls in self._retriever_pipeline_cls:
-            obj = cls.get_pipeline(stripped_settings, self.config, selected_ids)
-            if obj is None:
-                continue
+        if lc:
+            obj = LongContextRetrievalPipeline.get_pipeline(stripped_settings, self.config, selected_ids)
             obj.Source = self._resources["Source"]
             obj.Index = self._resources["Index"]
             obj.VS = self._vs
@@ -484,5 +484,17 @@ class FileIndex(BaseIndex):
             obj.FSPath = self._fs_path
             obj.user_id = user_id
             retrievers.append(obj)
+        else:
+            for cls in self._retriever_pipeline_cls:
+                obj = cls.get_pipeline(stripped_settings, self.config, selected_ids)
+                if obj is None:
+                    continue
+                obj.Source = self._resources["Source"]
+                obj.Index = self._resources["Index"]
+                obj.VS = self._vs
+                obj.DS = self._docstore
+                obj.FSPath = self._fs_path
+                obj.user_id = user_id
+                retrievers.append(obj)
 
         return retrievers

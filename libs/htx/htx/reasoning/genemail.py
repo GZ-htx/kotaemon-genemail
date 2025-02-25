@@ -56,13 +56,6 @@ class GenEmailPipeline(FullQAPipeline):
                 "value": False,
                 "component": "checkbox",
             },
-            # HTX: add parameter for long context
-            "use_long_context": {
-                "name": "Use Long Context",
-                "value": False,
-                "component": "checkbox",
-            },
-            # HTX: end
             "create_citation_viz": {
                 "name": "Create Embeddings Visualization",
                 "value": False,
@@ -75,7 +68,7 @@ class GenEmailPipeline(FullQAPipeline):
             },
             "system_prompt": {
                 "name": "System Prompt",
-                "value": "This is a question answering system",
+                "value": "Questo è un sistema per la generazione di email",
             },
             "qa_prompt": {
                 "name": "QA Prompt (contains {context}, {question}, {lang})",

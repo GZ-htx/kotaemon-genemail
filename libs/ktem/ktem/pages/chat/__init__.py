@@ -211,13 +211,6 @@ class ChatPage(BasePage):
                         elem_id="chat-settings-expand",
                         open=False,
                     ):
-                        with gr.Row():
-                            self.use_long_context = gr.State(value=DEFAULT_SETTING)
-                            self.use_long_context_check = gr.Checkbox(
-                                label="Use the entire document as context",
-                                container=False,
-                                elem_id="use-long-context",
-                            )
 
                         with gr.Row(elem_id="quick-setting-labels"):
                             gr.HTML("Reasoning method")
@@ -411,9 +404,6 @@ class ChatPage(BasePage):
                     self._reasoning_type,
                     self.model_type,
                     self.use_mindmap,
-                    # HTX: long context bool parameter
-                    self.use_long_context,
-                    # HTX: end
                     self.citation,
                     self.language,
                     self.state_chat,
@@ -731,12 +721,6 @@ class ChatPage(BasePage):
             outputs=[self._use_suggestion, self.followup_questions_ui],
             show_progress="hidden",
         )
-        # HTX: toggle of long context checkbox
-        self.use_long_context_check.change(
-            lambda x: x,
-            inputs=[self.use_long_context_check],
-            outputs=[self.use_long_context],
-        )
         self.chat_control.conversation_id.change(
             lambda: gr.update(visible=False),
             outputs=self.plot_panel,
@@ -994,7 +978,7 @@ class ChatPage(BasePage):
         if reasoning_type != DEFAULT_SETTING:
             gr.Info(f"Reasoning type changed to `{reasoning_type}`")
 
-        if reasoning_type == "genemail":
+        if reasoning_type == "genemail" or reasoning_type == "genemaillc":
             customers = get_customers_from_db()
             customer_names = [customer.name for customer in customers]
             first_customer = customer_names[0] if customer_names else None
@@ -1017,7 +1001,7 @@ class ChatPage(BasePage):
                 gr.update(visible=False),
             )
 
-        elif reasoning_type == "genscheda":
+        elif reasoning_type == "genscheda" or reasoning_type == "genschedalc":
             prompts = get_prompts_from_db()
             prompt_names = [p.name for p in prompts]
             first_prompt = prompt_names[0] if prompt_names else None
@@ -1079,9 +1063,6 @@ class ChatPage(BasePage):
         session_reasoning_type: str,
         session_llm: str,
         session_use_mindmap: bool | str,
-        # HTX: added long context bool parameter
-        session_use_long_context: bool | str,
-        # HTX: end
         session_use_citation: str,
         session_language: str,
         state: dict,
@@ -1108,8 +1089,6 @@ class ChatPage(BasePage):
             session_use_mindmap,
             "use citation",
             session_use_citation,
-            "use_long_context",
-            session_use_long_context,
             "language",
             session_language,
         )
@@ -1135,11 +1114,6 @@ class ChatPage(BasePage):
         if session_use_mindmap not in (DEFAULT_SETTING, None):
             settings["reasoning.options.simple.create_mindmap"] = session_use_mindmap
 
-        # HTX: added long context bool parameter
-        if session_use_long_context not in (DEFAULT_SETTING, None):
-            settings["reasoning.options.simple.use_long_context"] = session_use_long_context
-        # HTX: end
-
         if session_use_citation not in (DEFAULT_SETTING, None):
             settings[
                 "reasoning.options.simple.highlight_citation"
@@ -1159,6 +1133,11 @@ class ChatPage(BasePage):
             web_search = WebSearch()
             retrievers.append(web_search)
         else:
+            # HTX
+            lc = False
+            if reasoning_mode == "genemaillc" or reasoning_mode == "genschedalc" or reasoning_mode == "simplelc":
+                lc = True
+
             for index in self._app.index_manager.indices:
                 index_selected = []
                 if isinstance(index.selector, int):
@@ -1167,7 +1146,7 @@ class ChatPage(BasePage):
                     for i in index.selector:
                         index_selected.append(selecteds[i])
                 iretrievers = index.get_retriever_pipelines(
-                    settings, user_id, index_selected
+                    settings, user_id, index_selected, lc
                 )
                 retrievers += iretrievers
 
@@ -1189,9 +1168,6 @@ class ChatPage(BasePage):
         reasoning_type,
         llm_type,
         use_mind_map,
-        # HTX: added long context bool parameter
-        use_long_context,
-        # HTX: end
         use_citation,
         language,
         chat_state,
@@ -1210,10 +1186,10 @@ class ChatPage(BasePage):
         queue: asyncio.Queue[Optional[dict]] = asyncio.Queue()
 
         # HTX: if reasoning type is genemail
-        if reasoning_type == "genemail":
+        if reasoning_type == "genemail" or reasoning_type == "genemaillc":
             chat_input = f"{self.email_prompt}\n <br> Informazioni aggiuntive: {chat_input}"
 
-        if reasoning_type == "genscheda":
+        if reasoning_type == "genscheda" or reasoning_type == "genschedalc":
             chat_input = f"{self.task_prompt}\n <br> Informazioni aggiuntive: {chat_input}"
 
         print("Chat input", chat_input)
@@ -1224,9 +1200,6 @@ class ChatPage(BasePage):
             reasoning_type,
             llm_type,
             use_mind_map,
-            # HTX: added long context bool parameter
-            use_long_context,
-            # HTX: end
             use_citation,
             language,
             chat_state,
