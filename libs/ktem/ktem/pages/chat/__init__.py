@@ -1331,6 +1331,8 @@ class ChatPage(BasePage):
             return gr.update(value=f"<div style='white-space: pre-line; word-wrap: break-word;'>{self.email_prompt}</div>"
                             )
 
+        return gr.update(value="")
+
     def update_generated_prompt_scheda(self, prompt_name):
         prompt_id = self.prompt_map.get(prompt_name, None)
 
