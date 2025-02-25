@@ -1133,7 +1133,7 @@ class ChatPage(BasePage):
             web_search = WebSearch()
             retrievers.append(web_search)
         else:
-            # HTX
+            # HTX: add of lc parameter, which is True if user wants to use long context
             lc = False
             if reasoning_mode == "genemaillc" or reasoning_mode == "genschedalc" or reasoning_mode == "simplelc":
                 lc = True

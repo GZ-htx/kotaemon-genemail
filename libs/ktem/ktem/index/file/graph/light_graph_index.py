@@ -54,6 +54,7 @@ class LightRAGIndex(GraphRAGIndex):
         pipeline.collection_graph_id = self._get_or_create_collection_graph_id()
         return pipeline
 
+    # HTX: added lc parameter, it is True when this function is called with a reasoning type that uses Long Context
     def get_retriever_pipelines(
         self, settings: dict, user_id: int, selected: Any = None, lc: bool = False
     ) -> list["BaseFileIndexRetriever"]:

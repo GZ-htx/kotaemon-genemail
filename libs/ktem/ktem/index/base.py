@@ -125,6 +125,7 @@ class BaseIndex(abc.ABC):
         """
         ...
 
+    # HTX: added lc parameter, it is True when this function is called with a reasoning type that uses Long Context
     def get_retriever_pipelines(
         self, settings: dict, user_id: int, selected: Any = None, lc: Optional[bool] = False
     ) -> list["BaseComponent"]:
