@@ -53,7 +53,10 @@ class BaseApp:
             self._css = fi.read()
         with (dir_assets / "js" / "main.js").open() as fi:
             self._js = fi.read()
-            self._js = self._js.replace("LOGO_URL", "http://0.0.0.0:7860/file=/Users/tommaso/clean-kotaemon/ktem_app_data/gradio_tmp/6ca2cfcdb04f195c5148189ef7ca8afb6efd27b7/logo_without_bg.png")
+            # HTX: added logo
+            base_url = "http://0.0.0.0:7860/file="
+            logo_url = f"{base_url}{dir_assets}/img/logo_without_bg.png"
+            self._js = self._js.replace("LOGO_URL", logo_url)
         with (dir_assets / "js" / "pdf_viewer.js").open() as fi:
             self._pdf_view_js = fi.read()
             # workaround for Windows path

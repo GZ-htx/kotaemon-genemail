@@ -14,37 +14,37 @@ class SchedaPromptManagement(BasePage):
         self.on_building_ui()
 
     def on_building_ui(self):
-        with gr.Tab(label="Prompts list"):
+        with gr.Tab(label="Lista Tipologie"):
             self.state_prompt_list = gr.State(value=None)
             self.prompt_list = gr.DataFrame(
-                headers=["id", "name", "task"],
+                headers=["id", "nome", "task"],
                 interactive=False,
             )
             
             with gr.Group(visible=False) as self._selected_panel:
                 self.selected_prompt_id = gr.Number(value=-1, visible=False)
-                self.name_edit = gr.Textbox(label="Name")
+                self.name_edit = gr.Textbox(label="Nome")
                 self.task_edit = gr.Textbox(label="Task", lines=3)
 
             with gr.Row(visible=False) as self._selected_panel_btn:
                 with gr.Column():
-                    self.btn_edit_save = gr.Button("Save")
+                    self.btn_edit_save = gr.Button("Salva")
                 with gr.Column():
-                    self.btn_delete = gr.Button("Delete")
+                    self.btn_delete = gr.Button("Elimina")
                     with gr.Row():
                         self.btn_delete_yes = gr.Button(
-                            "Confirm delete", variant="primary", visible=False
+                            "Conferma", variant="primary", visible=False
                         )
-                        self.btn_delete_no = gr.Button("Cancel", visible=False)
+                        self.btn_delete_no = gr.Button("Annulla", visible=False)
                 with gr.Column():
-                    self.btn_close = gr.Button("Close")
+                    self.btn_close = gr.Button("Chiudi")
                     
-        with gr.Tab(label="Create prompt"):
+        with gr.Tab(label="Crea Tipologia"):
             self.name_new = gr.Textbox(label="Name", interactive=True)
             self.task_new = gr.Textbox(
                 label="Task", lines=3, interactive=True
             )
-            self.btn_new = gr.Button("Create prompt")
+            self.btn_new = gr.Button("Crea Tipologia")
             
     def on_subscribe_public_events(self):
         self._app.subscribe_event(

@@ -16,58 +16,58 @@ class TenderTypesManagement(BasePage):
         self.on_building_ui()
 
     def on_building_ui(self):
-        with gr.Tab(label="Tender Types list"):
+        with gr.Tab(label="Lista Tipologie"):
             self.state_tender_type_list = gr.State(value=None)
             self.tender_type_list = gr.DataFrame(
-                headers=["id", "name", "description", "attachment description", "tender_type description", "task description", "template description"],
+                headers=["id", "nome", "descrizione tipologia", "descrizione allegato", "descrizione cliente", "descrizione task", "descrizione template"],
                 interactive=False,
                 column_widths=[50, 200, 200, 200, 200, 200, 200],
             )
 
             with gr.Group(visible=False) as self._selected_panel:
                 self.selected_tender_type_id = gr.Number(value=-1, visible=False)
-                self.name_edit = gr.Textbox(label="Name")
-                self.description_edit = gr.Textbox(label="Description", lines=3)
-                self.attachment_description_edit = gr.Textbox(label="Attachment Description", lines=3)
-                self.customer_description_edit = gr.Textbox(label="Customer Description", lines=3)
-                self.task_description_edit = gr.Textbox(label="Task Description", lines=3)
-                self.template_description_edit = gr.Textbox(label="Template Description", lines=3)
+                self.name_edit = gr.Textbox(label="Nome")
+                self.description_edit = gr.Textbox(label="Descrizione Tipologia", lines=3)
+                self.attachment_description_edit = gr.Textbox(label="Descrizione Allegato", lines=3)
+                self.customer_description_edit = gr.Textbox(label="Descrizione Cliente", lines=3)
+                self.task_description_edit = gr.Textbox(label="Descrizione Task", lines=3)
+                self.template_description_edit = gr.Textbox(label="Descrizione Template", lines=3)
 
             with gr.Row(visible=False) as self._selected_panel_btn:
                 with gr.Column():
-                    self.btn_edit_save = gr.Button("Save")
+                    self.btn_edit_save = gr.Button("Salva")
                 with gr.Column():
-                    self.btn_delete = gr.Button("Delete")
+                    self.btn_delete = gr.Button("Elimina")
                     with gr.Row():
                         self.btn_delete_yes = gr.Button(
-                            "Confirm delete", variant="primary", visible=False
+                            "Conferma", variant="primary", visible=False
                         )
-                        self.btn_delete_no = gr.Button("Cancel", visible=False)
+                        self.btn_delete_no = gr.Button("Annulla", visible=False)
                 with gr.Column():
-                    self.btn_close = gr.Button("Close")
+                    self.btn_close = gr.Button("Chiudi")
 
-        with gr.Tab(label="Create Tender Type"):
-            self.name_new = gr.Textbox(label="Name", interactive=True)
+        with gr.Tab(label="Crea Tipologia"):
+            self.name_new = gr.Textbox(label="Nome", interactive=True)
             self.description_new = gr.Textbox(
-                label="Description", lines=3, interactive=True,
+                label="Descrizione Tipologia", lines=3, interactive=True,
             )
             self.attachment_description_new = gr.Textbox(
-                label="Attachment Description", lines=3, interactive=True,
+                label="Descrizione Allegato", lines=3, interactive=True,
                 value=DEFAULT_ATTACHMENT_DESCRIPTION
             )
             self.customer_description_new = gr.Textbox(
-                label="Customer Description", lines=3, interactive=True,
+                label="Descrizione Cliente", lines=3, interactive=True,
                 value=DEFAULT_CUSTOMER_DESCRIPTION
             )
             self.task_description_new = gr.Textbox(
-                label="Task Description", lines=3, interactive=True,
+                label="Descrizione Task", lines=3, interactive=True,
                 value=DEFAULT_TASK_DESCRIPTION
             )
             self.template_description_new = gr.Textbox(
-                label="Template Description", lines=3, interactive=True,
+                label="Descrizione Template", lines=3, interactive=True,
                 value=DEFAULT_TEMPLATE_DESCRIPTION
             )
-            self.btn_new = gr.Button("Create Tender Type")
+            self.btn_new = gr.Button("Crea Tipologia")
 
     def on_subscribe_public_events(self):
         self._app.subscribe_event(

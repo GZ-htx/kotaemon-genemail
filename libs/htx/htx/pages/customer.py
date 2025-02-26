@@ -14,37 +14,37 @@ class CustomerManagement(BasePage):
         self.on_building_ui()
 
     def on_building_ui(self):
-        with gr.Tab(label="Customer list"):
+        with gr.Tab(label="Lista Clienti"):
             self.state_customer_list = gr.State(value=None)
             self.customer_list = gr.DataFrame(
-                headers=["id", "name", "description"],
+                headers=["id", "nome", "descrizione"],
                 interactive=False,
             )
 
             with gr.Group(visible=False) as self._selected_panel:
                 self.selected_customer_id = gr.Number(value=-1, visible=False)
-                self.name_edit = gr.Textbox(label="Name")
-                self.description_edit = gr.Textbox(label="Description", lines=3)
+                self.name_edit = gr.Textbox(label="Nome")
+                self.description_edit = gr.Textbox(label="Descrizione", lines=3)
 
             with gr.Row(visible=False) as self._selected_panel_btn:
                 with gr.Column():
-                    self.btn_edit_save = gr.Button("Save")
+                    self.btn_edit_save = gr.Button("Salva")
                 with gr.Column():
-                    self.btn_delete = gr.Button("Delete")
+                    self.btn_delete = gr.Button("Elimina")
                     with gr.Row():
                         self.btn_delete_yes = gr.Button(
-                            "Confirm delete", variant="primary", visible=False
+                            "Conferma", variant="primary", visible=False
                         )
-                        self.btn_delete_no = gr.Button("Cancel", visible=False)
+                        self.btn_delete_no = gr.Button("Annulla", visible=False)
                 with gr.Column():
-                    self.btn_close = gr.Button("Close")
+                    self.btn_close = gr.Button("Chiudi")
 
-        with gr.Tab(label="Create customer"):
-            self.name_new = gr.Textbox(label="Name", interactive=True)
+        with gr.Tab(label="Crea cliente"):
+            self.name_new = gr.Textbox(label="Nome", interactive=True)
             self.description_new = gr.Textbox(
-                label="Description", lines=3, interactive=True
+                label="Descrizione", lines=3, interactive=True
             )
-            self.btn_new = gr.Button("Create customer")
+            self.btn_new = gr.Button("Crea cliente")
 
     def on_subscribe_public_events(self):
         self._app.subscribe_event(
