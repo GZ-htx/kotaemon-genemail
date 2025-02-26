@@ -26,6 +26,8 @@ PASSWORD_RULE = """**Password rule:**
     ^ $ * . [ ] { } ( ) ? - " ! @ # % & / \\ , > < ' : ; | _ ~  + =
 """
 
+ROLE_MAPPING = {0: "Simple", 1: "Advanced"}
+
 
 def validate_username(usn):
     """Validate that whether username is valid
@@ -137,8 +139,8 @@ class UserManagement(BasePage):
         with gr.Tab(label="User list"):
             self.state_user_list = gr.State(value=None)
             self.user_list = gr.DataFrame(
-                headers=["id", "name", "admin"],
-                column_widths=[0, 50, 50],
+                headers=["id", "name", "admin", "role"],
+                column_widths=[0, 50, 50, 50],
                 interactive=False,
             )
 
@@ -151,7 +153,17 @@ class UserManagement(BasePage):
                         label="Confirm change password",
                         type="password",
                     )
-                self.admin_edit = gr.Checkbox(label="Admin")
+                # HTX: add role
+                with gr.Row():
+                    self.role_edit = gr.Dropdown(
+                        label="Role",
+                        choices=[
+                            ("Simple", 0),
+                            ("Advanced", 1)
+                        ],
+                    )
+                    self.admin_edit = gr.Checkbox(label="Admin")
+                # HTX: end
 
             with gr.Row(visible=False) as self._selected_panel_btn:
                 with gr.Column():
@@ -174,6 +186,14 @@ class UserManagement(BasePage):
             self.pwd_cnf_new = gr.Textbox(
                 label="Confirm password", type="password", interactive=True
             )
+            # HTX: add role
+            self.role_new = gr.Dropdown(
+                label="Role",
+                choices=[
+                    ("Simple", 0),
+                    ("Advanced", 1)
+                ],
+            )
             with gr.Row():
                 gr.Markdown(USERNAME_RULE)
                 gr.Markdown(PASSWORD_RULE)
@@ -182,8 +202,9 @@ class UserManagement(BasePage):
     def on_register_events(self):
         self.btn_new.click(
             self.create_user,
-            inputs=[self.usn_new, self.pwd_new, self.pwd_cnf_new],
-            outputs=[self.usn_new, self.pwd_new, self.pwd_cnf_new],
+            # HTX: add role
+            inputs=[self.usn_new, self.pwd_new, self.pwd_cnf_new, self.role_new],
+            outputs=[self.usn_new, self.pwd_new, self.pwd_cnf_new, self.role_new],
         ).then(
             self.list_users,
             inputs=self._app.user_id,
@@ -209,6 +230,8 @@ class UserManagement(BasePage):
                 self.usn_edit,
                 self.pwd_edit,
                 self.pwd_cnf_edit,
+                # HTX: add role
+                self.role_edit,
                 self.admin_edit,
             ],
             show_progress="hidden",
@@ -246,6 +269,8 @@ class UserManagement(BasePage):
                 self.usn_edit,
                 self.pwd_edit,
                 self.pwd_cnf_edit,
+                # HTX: add role
+                self.role_edit,
                 self.admin_edit,
             ],
             outputs=[self.pwd_edit, self.pwd_cnf_edit],
@@ -277,6 +302,8 @@ class UserManagement(BasePage):
                     self.usn_new,
                     self.pwd_new,
                     self.pwd_cnf_new,
+                    # HTX: add role
+                    self.role_new,
                     self.state_user_list,
                     self.user_list,
                     self.selected_user_id,
@@ -284,17 +311,18 @@ class UserManagement(BasePage):
             },
         )
 
-    def create_user(self, usn, pwd, pwd_cnf):
+    # HTX: add role
+    def create_user(self, usn, pwd, pwd_cnf, role):
         errors = validate_username(usn)
         if errors:
             gr.Warning(errors)
-            return usn, pwd, pwd_cnf
+            return usn, pwd, pwd_cnf, role
 
         errors = validate_password(pwd, pwd_cnf)
         print(errors)
         if errors:
             gr.Warning(errors)
-            return usn, pwd, pwd_cnf
+            return usn, pwd, pwd_cnf, role
 
         with Session(engine) as session:
             statement = select(User).where(User.username_lower == usn.lower())
@@ -305,18 +333,19 @@ class UserManagement(BasePage):
 
             hashed_password = hashlib.sha256(pwd.encode()).hexdigest()
             user = User(
-                username=usn, username_lower=usn.lower(), password=hashed_password
+                username=usn, username_lower=usn.lower(), password=hashed_password, role=role
             )
             session.add(user)
             session.commit()
             gr.Info(f'User "{usn}" created successfully')
 
-        return "", "", ""
+        return "", "", "", ""
 
+    # HTX: add role
     def list_users(self, user_id):
         if user_id is None:
             return [], pd.DataFrame.from_records(
-                [{"id": "-", "username": "-", "admin": "-"}]
+                [{"id": "-", "username": "-", "admin": "-", "role": "-"}]
             )
 
         with Session(engine) as session:
@@ -324,19 +353,19 @@ class UserManagement(BasePage):
             user = session.exec(statement).one()
             if not user.admin:
                 return [], pd.DataFrame.from_records(
-                    [{"id": "-", "username": "-", "admin": "-"}]
+                    [{"id": "-", "username": "-", "admin": "-", "role": "-"}]
                 )
 
             statement = select(User)
             results = [
-                {"id": user.id, "username": user.username, "admin": user.admin}
+                {"id": user.id, "username": user.username, "admin": user.admin, "role": ROLE_MAPPING.get(int(user.role), "Unknown")}
                 for user in session.exec(statement).all()
             ]
             if results:
                 user_list = pd.DataFrame.from_records(results)
             else:
                 user_list = pd.DataFrame.from_records(
-                    [{"id": "-", "username": "-", "admin": "-"}]
+                    [{"id": "-", "username": "-", "admin": "-", "role": "-"}]
                 )
 
         return results, user_list
@@ -361,6 +390,8 @@ class UserManagement(BasePage):
             usn_edit = gr.update(value="")
             pwd_edit = gr.update(value="")
             pwd_cnf_edit = gr.update(value="")
+            # HTX: add role
+            role_edit = gr.update(value=0)
             admin_edit = gr.update(value=False)
         else:
             _selected_panel = gr.update(visible=True)
@@ -376,6 +407,8 @@ class UserManagement(BasePage):
             usn_edit = gr.update(value=user.username)
             pwd_edit = gr.update(value="")
             pwd_cnf_edit = gr.update(value="")
+            # HTX: add role
+            role_edit = gr.update(value=user.role)
             admin_edit = gr.update(value=user.admin)
 
         return (
@@ -387,6 +420,8 @@ class UserManagement(BasePage):
             usn_edit,
             pwd_edit,
             pwd_cnf_edit,
+            # HTX: add role
+            role_edit,
             admin_edit,
         )
 
@@ -404,7 +439,7 @@ class UserManagement(BasePage):
 
         return btn_delete, btn_delete_yes, btn_delete_no
 
-    def save_user(self, selected_user_id, usn, pwd, pwd_cnf, admin):
+    def save_user(self, selected_user_id, usn, pwd, pwd_cnf, role, admin):
         errors = validate_username(usn)
         if errors:
             gr.Warning(errors)
@@ -421,6 +456,7 @@ class UserManagement(BasePage):
             user = session.exec(statement).one()
             user.username = usn
             user.username_lower = usn.lower()
+            user.role = role
             user.admin = admin
             if pwd:
                 user.password = hashlib.sha256(pwd.encode()).hexdigest()
