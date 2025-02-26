@@ -68,7 +68,7 @@ class GenSchedaPipelineLC(GenSchedaPipeline):
     @classmethod
     def get_info(cls) -> dict:
         return {
-            "id": "genschedalc",
+            "id": "scheda-gen-entire-document",
             "name": "Scheda Generation with long context",
             "description": (
                 "Pipeline for the generation of schede using the entire document"

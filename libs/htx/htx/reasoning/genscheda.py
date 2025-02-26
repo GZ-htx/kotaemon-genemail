@@ -11,7 +11,7 @@ class GenSchedaPipeline(FullQAPipeline):
     @classmethod
     def get_info(cls) -> dict:
         return {
-            "id": "genscheda",
+            "id": "scheda-gen",
             "name": "Scheda Generation",
             "description": (
                 "Scheda generation pipeline."

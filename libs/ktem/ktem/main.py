@@ -160,6 +160,7 @@ class App(BaseApp):
                         )
 
                     is_admin = user.admin
+                    user_role = user.role
 
                 tabs_update = []
                 for k in self._tabs.keys():

@@ -70,7 +70,7 @@ class FullQAPipelineLC(FullQAPipeline):
     @classmethod
     def get_info(cls) -> dict:
         return {
-            "id": "simplelc",
+            "id": "simple-entire-document",
             "name": "Q&A Answering with long context",
             "description": (
                 "Pipeline for answering using the entire document"

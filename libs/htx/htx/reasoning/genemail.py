@@ -11,7 +11,7 @@ class GenEmailPipeline(FullQAPipeline):
     @classmethod
     def get_info(cls) -> dict:
         return {
-            "id": "genemail",
+            "id": "email-gen",
             "name": "Email Generation",
             "description": (
                 "Email generation pipeline."

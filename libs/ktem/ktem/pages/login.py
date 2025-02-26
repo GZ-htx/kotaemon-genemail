@@ -112,6 +112,7 @@ class LoginPage(BasePage):
                     pwd="",
                     user_id=user_id,
                     is_admin=False,
+                    role=0,
                 )
                 return user_id, "", ""
         else:

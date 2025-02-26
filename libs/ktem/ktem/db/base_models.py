@@ -62,6 +62,7 @@ class BaseUser(SQLModel):
     username_lower: str = Field(unique=True)
     password: str
     admin: bool = Field(default=False)
+    role: int = Field(default=0)
 
 
 class BaseSettings(SQLModel):

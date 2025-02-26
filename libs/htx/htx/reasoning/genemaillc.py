@@ -68,7 +68,7 @@ class GenEmailPipelineLC(GenEmailPipeline):
     @classmethod
     def get_info(cls) -> dict:
         return {
-            "id": "genemaillc",
+            "id": "email-gen-entire-document",
             "name": "Email Generation with long context",
             "description": (
                 "Pipeline for the generation of emails using the entire document"
