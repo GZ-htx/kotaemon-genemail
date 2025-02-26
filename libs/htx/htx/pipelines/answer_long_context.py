@@ -1,4 +1,9 @@
 from typing import Generator
+
+# HTX
+import gradio as gr
+from openai import RateLimitError
+
 from kotaemon.base import (
     BaseComponent,
     Document,
@@ -69,8 +74,6 @@ class AnswerWithLongContext(BaseComponent):
 
         messages.append(HumanMessage(content=prompt))
 
-        print(messages)
-
         try:
             # try streaming first
             print("Trying LLM streaming")
@@ -81,6 +84,16 @@ class AnswerWithLongContext(BaseComponent):
         except NotImplementedError:
             print("Streaming is not supported, falling back to normal processing")
             output = self.llm(messages).text
+            yield Document(channel="chat", content=output)
+        # HTX: added exception for context too long
+        except RateLimitError as e:
+            if "Request too large" in str(e):
+                gr.Info("Il contesto è troppo lungo!")
+                output = "⚠️ Errore: Il contesto supera la lunghezza massima consentita. Utilizza il metodo senza Long Context o togli qualche allegato!"
+            else:
+                gr.Info("Hai superato il limite di richieste. Attendi qualche secondo e riprova.")
+                output = "⚠️ Errore: Hai superato il limite di richieste al minuto. Aspetta e riprova più tardi."
+
             yield Document(channel="chat", content=output)
 
         answer = Document(

@@ -978,42 +978,44 @@ class ChatPage(BasePage):
         if reasoning_type != DEFAULT_SETTING:
             gr.Info(f"Reasoning type changed to `{reasoning_type}`")
 
+        # Ricarico i dati ogni volta
+        customers = get_customers_from_db()
+        self.customer_map = {c.name: c.id for c in customers}
+        customer_names = list(self.customer_map.keys())
+        first_customer = customer_names[0] if customer_names else None
+
+        tender_types = get_tender_types_from_db()
+        self.tender_type_map = {t.name: t.id for t in tender_types}
+        tender_type_names = list(self.tender_type_map.keys())
+        first_tender_type = tender_type_names[0] if tender_type_names else None
+
+        prompts = get_prompts_from_db()
+        self.prompt_map = {p.name: p.id for p in prompts}
+        prompt_names = list(self.prompt_map.keys())
+        first_prompt = prompt_names[0] if prompt_names else None
+
         if reasoning_type == "genemail" or reasoning_type == "genemaillc":
-            customers = get_customers_from_db()
-            customer_names = [customer.name for customer in customers]
-            first_customer = customer_names[0] if customer_names else None
-
-            print("First customer", first_customer)
-
-            tender_types = get_tender_types_from_db()
-            tender_type_names = [tender_type.name for tender_type in tender_types]
-            first_tender_type = tender_type_names[0] if tender_type_names else None
-
             return (
                 reasoning_type,
                 gr.update(visible=True),
                 gr.update(visible=True, open=False),
                 self.update_generated_prompt_email(first_customer, first_tender_type),
-                gr.update(value=first_customer, visible=True),
-                gr.update(value=first_tender_type, visible=True),
+                gr.update(choices=customer_names, value=first_customer, visible=True),  # Aggiorna clienti
+                gr.update(choices=tender_type_names, value=first_tender_type, visible=True),  # Aggiorna tender type
                 gr.update(visible=False),
                 gr.update(visible=True),
                 gr.update(visible=False),
             )
 
         elif reasoning_type == "genscheda" or reasoning_type == "genschedalc":
-            prompts = get_prompts_from_db()
-            prompt_names = [p.name for p in prompts]
-            first_prompt = prompt_names[0] if prompt_names else None
-
             return (
                 reasoning_type,
-                gr.update(visible=True),  # Mostra l'accordion
+                gr.update(visible=True),
                 gr.update(visible=True, open=False),
                 self.update_generated_prompt_scheda(first_prompt),
                 gr.update(visible=False),
                 gr.update(visible=False),
-                gr.update(value=first_prompt, visible=True),
+                gr.update(choices=prompt_names, value=first_prompt, visible=True),  # Aggiorna i prompt
                 gr.update(visible=False),
                 gr.update(visible=True),
             )

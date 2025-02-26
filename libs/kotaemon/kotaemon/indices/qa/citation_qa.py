@@ -1,9 +1,11 @@
+import gradio as gr
 import threading
 from collections import defaultdict
 from typing import Generator
 
 import numpy as np
 from decouple import config
+from openai import RateLimitError
 from theflow.settings import settings as flowsettings
 
 from kotaemon.base import (
@@ -266,6 +268,16 @@ class AnswerWithContextPipeline(BaseComponent):
         except NotImplementedError:
             print("Streaming is not supported, falling back to normal processing")
             output = self.llm(messages).text
+            yield Document(channel="chat", content=output)
+        # HTX: added exception for context too long
+        except RateLimitError as e:
+            if "Request too large" in str(e):
+                gr.Info("Il contesto è troppo lungo!")
+                output = "⚠️ Errore: Il contesto supera la lunghezza massima consentita. Utilizza il metodo senza Long Context o togli qualche allegato!"
+            else:
+                gr.Info("Hai superato il limite di richieste. Attendi qualche secondo e riprova.")
+                output = "⚠️ Errore: Hai superato il limite di richieste. Aspetta e riprova più tardi."
+
             yield Document(channel="chat", content=output)
 
         if logprobs:
