@@ -82,7 +82,7 @@ class TenderTypesManagement(BasePage):
         self._app.subscribe_event(
             name="onSignOut",
             definition={
-                "fn": lambda: ("", "", None, None, -1),
+                "fn": lambda: ("", "", "", "", "", "", None, None, -1),
                 "outputs": [
                     self.name_new,
                     self.description_new,
